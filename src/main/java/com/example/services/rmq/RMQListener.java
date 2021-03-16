@@ -2,6 +2,7 @@ package com.example.services.rmq;
 
 import com.example.dto.BlockDTO;
 import com.example.services.database.psql.PSQLService;
+import com.example.services.redis.RedisService;
 import com.example.utils.MessageParser;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -21,10 +22,13 @@ public class RMQListener {
 
     private final MessageParser messageParser;
 
+    private final RedisService redisService;
+
     @Autowired
-    public RMQListener(PSQLService psqlService, MessageParser messageParser) {
+    public RMQListener(PSQLService psqlService, MessageParser messageParser, RedisService redisService) {
         this.psqlService = psqlService;
         this.messageParser = messageParser;
+        this.redisService = redisService;
     }
 
     @SneakyThrows
@@ -43,8 +47,8 @@ public class RMQListener {
             System.out.println(" [x] Received '" + message + "'");
 
             BlockDTO newBlock = messageParser.parseMessage(message);
-
             psqlService.insertRecord(newBlock);
+            redisService.incrementCounter();
         };
         channel.basicConsume("Test", true, deliverCallback, consumerTag -> {});
     }
