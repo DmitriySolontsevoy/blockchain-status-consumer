@@ -2,20 +2,20 @@ package com.example.services.redis;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.Jedis;
 
 @Component
 public class RedisService {
 
-    private final JedisCluster jedisCluster;
+    private final Jedis jedis;
 
     @Autowired
-    public RedisService(JedisCluster jedisCluster) {
-        this.jedisCluster = jedisCluster;
+    public RedisService(Jedis jedis) {
+        this.jedis = jedis;
     }
 
     public long getCounter() {
-        String value = this.jedisCluster.get("counter");
+        String value = this.jedis.get("counter");
 
         if (value == null) {
             return 0L;
@@ -26,6 +26,6 @@ public class RedisService {
 
     public void incrementCounter() {
         long currentCounter = this.getCounter();
-        this.jedisCluster.set("counter", String.valueOf(currentCounter));
+        this.jedis.set("counter", String.valueOf(currentCounter));
     }
 }
