@@ -26,6 +26,7 @@ public class RedisService {
 
     public void incrementCounter() {
         long currentCounter = this.getCounter();
+        currentCounter++;
         this.jedis.set("counter", String.valueOf(currentCounter));
     }
 }

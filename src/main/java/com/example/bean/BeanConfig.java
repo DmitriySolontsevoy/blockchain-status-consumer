@@ -1,12 +1,16 @@
 package com.example.bean;
 
 import com.google.gson.Gson;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.Jedis;
 
 @Configuration
 public class BeanConfig {
+
+    @Value("${redis.host}")
+    private String host;
 
     @Bean
     public Gson getGson() {
@@ -15,6 +19,6 @@ public class BeanConfig {
 
     @Bean
     public Jedis getJedisCluster() {
-        return new Jedis("localhost:6379");
+        return new Jedis(this.host);
     }
 }

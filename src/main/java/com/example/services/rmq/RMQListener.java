@@ -10,6 +10,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +18,9 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class RMQListener {
+
+    @Value("${rabbitmq.host}")
+    private String host;
 
     private final PSQLService psqlService;
 
@@ -35,7 +39,7 @@ public class RMQListener {
     @PostConstruct
     public void setup() {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost(this.host);
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
@@ -46,9 +50,9 @@ public class RMQListener {
 
             System.out.println(" [x] Received '" + message + "'");
 
-            BlockDTO newBlock = messageParser.parseMessage(message);
-            psqlService.insertRecord(newBlock);
-            redisService.incrementCounter();
+            BlockDTO newBlock = this.messageParser.parseMessage(message);
+            this.psqlService.insertRecord(newBlock);
+            this.redisService.incrementCounter();
         };
         channel.basicConsume("Test", true, deliverCallback, consumerTag -> {});
     }
