@@ -4,12 +4,12 @@ COPY pom.xml /home/app
 RUN mvn -f /home/app/pom.xml clean package
 
 FROM openjdk:8
-COPY --from=build /home/app/target/docker-homework-0.0.1-SNAPSHOT.jar /usr/local/lib/demo.jar
+COPY --from=build /home/app/target/docker-homework-0.0.1-SNAPSHOT.jar /usr/local/lib/app.jar
 
 EXPOSE 6379 5672 5432 8082
 
 ENTRYPOINT java \
-    -jar /usr/local/lib/demo.jar \
+    -jar /usr/local/lib/app.jar \
     --rabbitmq.host=$RABBITMQ_HOST \
     --redis.host=$REDIS_HOST \
     --spring.datasource.url=jdbc:postgresql://$POSTGRES_HOST:5432/postgres \
